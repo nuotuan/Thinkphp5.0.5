@@ -1,0 +1,98 @@
+{extend name="base/base"}
+{block name="style"}
+<link rel="stylesheet" href="__CSS__/datatable.css">
+{/block}
+{block name="body"}
+<div class="admin-main">
+    <blockquote class="layui-elem-quote">{$lang[ 'config_manage' ]}</blockquote>
+    <div>
+    	<div class="layui-input-inline">
+       		<a class="layui-btn"  href="{:url( 'admin/Config/configAdd' )}"><i class="layui-icon">&#xe608;</i> {$lang[ 'add_config' ]}</a>
+        	<a class="layui-btn"  href="javascript:;" onClick="javascript:location.reload();"><i class="layui-icon">&#x1002;</i> {$lang[ 'refresh' ]}</a>
+        </div>
+        <div class="layui-input-inline my-right">
+    		<a class="layui-btn" id="search" url="{:url( 'admin/Config/index' , '', '' , true )}"><i class="layui-icon">&#xe615;</i> {$lang[ 'search' ]}</a>
+    	</div>
+        <div class="layui-input-inline my-right">
+      		<input type="text" name="search"  placeholder="{$lang[ 'input_keyword' ]}" class="layui-input" value="{:input('param.search')}">
+    	</div>
+    <table class="layui-table" id="layui-table">
+        <thead>
+	        <tr>
+	            <th>{$lang[ 'id' ]}</th>
+	            <th>{$lang[ 'config_charac' ]}</th>
+	            <th>{$lang[ 'config_title' ]}</th>
+	            <th>{$lang[ 'remark' ]}</th>
+	            <th>{$lang[ 'operate' ]}</th>
+	        </tr>
+        </thead>
+        <tbody>
+        	{volist name="data" id="vl" empty="<tr><td colspan=6 class='my-center'>$lang[empty]</td></tr>"}
+	        <tr>
+	        	<td>{$vl.id}</td>
+	        	<td>{$vl.name}</td>
+	        	<td>{$vl.title}</td>
+	        	<td>{$vl.remark}</td>
+	        	<td>
+					<a class="layui-btn layui-btn-small" href="{:url( 'admin/Config/configEdit' , array( 'id' => $vl[ 'id' ] ) )}"><i class="layui-icon">&#xe642;</i>{$lang[ 'edit' ]}</a>
+                	<button class="layui-btn layui-btn-small" onclick="layui.del({$vl.id})"><i class="layui-icon">&#xe640;</i>{$lang[ 'del' ]}</button>
+				</td>
+	        </tr>
+	        {/volist}
+        </tbody>
+    </table>
+    <div class="my-page">{$page}<p>{$page_msg}</p></div>
+    
+</div>
+{/block}
+{block name="script"}
+<script>
+    layui.config({
+        base: '__JS__/' //自定义layui组件的目录
+    });
+    layui.use([ 'jquery' ] , function(){
+        var $ = layui.jquery ;
+        //搜索框获取焦点
+        $( "input[name='search']" ).focus();
+        var result=$( "input[name='search']" ).val();//对input取值
+        $( "input[name='search']" ).val( "" )//使input的值为空
+        $( "input[name='search']" ).val( result );//重新负值
+        $( "input[name='search']" )[ 0 ].scrollLeft=700; //这里我对文本框的属性做了一个猜想，所以进行一个偏移
+        //搜索
+        $( "#search" ).on( 'click' , function(){
+        	var url = $( this ).attr( 'url' );
+    		var search = $( 'input[name=search]' ).val();
+    		if(search != ''){
+    			url += '/search/' + search;
+    		}
+    		window.location.href = url;
+        });
+      	//回车搜索
+    	$( "input[name='search']" ).keyup(function(e) {
+    		if (e.keyCode === 13) {
+    			$("#search").click();
+    			return false;
+    		}
+    	});
+    });
+    
+    layui.define('layer',function(exports) {
+        var $ = layui.jquery;
+        //删除
+        exports('del', function(id){
+            layer.confirm( "{$lang[ 'confirm' ]}" , { icon : 3 , title : "{$lang[ 'del' ]}"} , function( index ){
+                $.get("{:url( 'admin/Config/configDel' , '' , '' , true )}/id/" + id , '' , function( data ){
+                    if( data.code == 1){
+                        layer.msg(data.msg, {icon:1});
+                        setTimeout(function(){
+                            location.href = data.url;
+                        },(2000)); 
+                    } else{
+                        layer.msg(data.msg, {icon:2})
+                    }
+                })
+            })
+        })
+    });
+</script>
+{/block}

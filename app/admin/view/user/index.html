@@ -1,0 +1,124 @@
+{extend name="base/base"}
+{block name="body"}
+<div class="admin-main">
+    <blockquote class="layui-elem-quote">{$lang[ 'user_manage' ]}</blockquote>
+    <div class="layui-input-inline">
+    	<a class="layui-btn" href="{:url( 'admin/User/userAdd' )}"><i class="layui-icon">&#xe608;</i> {$lang[ 'add_user' ]}</a>
+    	<a class="layui-btn" href="javascript:;" onClick="javascript:location.reload();"><i class="layui-icon">&#x1002;</i> {$lang[ 'refresh' ]}</a>
+    </div>
+    <div class="layui-input-inline my-right">
+   		<a class="layui-btn" id="search" url="{:url( 'admin/User/index' , '', '' , true )}"><i class="layui-icon">&#xe615;</i> {$lang[ 'search' ]}</a>
+   	</div>
+       <div class="layui-input-inline my-right">
+     		<input type="text" name="search"  placeholder="{$lang[ 'input_keyword' ]}" class="layui-input" value="{:input('param.search')}">
+   	</div>
+    <table class="layui-table" id="layui-table">
+        <thead>
+        <tr>
+            <th>{$lang[ 'uid' ]}</th>
+            <th class="my-center">{$lang[ 'name' ]}</th>
+            <th class="my-center">{$lang[ 'email' ]}</th>
+            <th class="my-center">{$lang[ 'last_login_time' ]}</th>
+            <th class="my-center">{$lang[ 'login_num' ]}</th>
+            <th class="my-center">{$lang[ 'last_login_ip' ]}</th>
+            <th class="my-center">{$lang[ 'user_status' ]}</th>
+            <th>{$lang[ 'operate' ]}</th>
+        </tr>
+        </thead>
+        <tbody>
+        	{volist name="data" id="vl" empty="<tr><td colspan=8 class='my-center'>$lang[empty]</td></tr>"}
+	        <tr>
+	        	<td>{$vl.uid}</td>
+	        	<td class="my-center">{$vl.nickname}</td>
+	        	<td class="my-center">{$vl.email}</td>
+	        	<td class="my-center">{$vl.last_login_time}</td>
+	        	<td class="my-center">{$vl.login}</td>
+	        	<td class="my-center">{$vl.last_login_ip}<br/>{$vl.last_login_address}</td>
+	        	<td class="my-center">
+		        	<div class="layui-form layui-input-inline status">
+	            		<input type="checkbox" name="status" lay-filter="status" value='{$vl.uid}' title="{$lang[ 'enable' ]}"  {if $vl.status eq '正常'}checked{/if}/>
+	            	</div>
+            	</td>
+	        	<td>
+					<a class="layui-btn layui-btn-small" href="{:url( 'admin/User/userEdit' , array( 'uid' => $vl[ 'uid' ] ) )}"><i class="layui-icon">&#xe642;</i>{$lang[ 'edit' ]}</a>
+                	<a class="layui-btn layui-btn-small" href="{:url( 'admin/User/userPwd' , array( 'uid' => $vl[ 'uid' ] ) )}"><i class="layui-icon">&#xe642;</i>{$lang[ 'edit_pwd' ]}</a>
+                	<button class="layui-btn layui-btn-small" onclick="layui.del({$vl.uid})"><i class="layui-icon">&#xe640;</i>{$lang[ 'del' ]}</button>
+				</td>
+	        </tr>
+	        {/volist}
+        </tbody>
+    </table>
+    <div class="my-page">{$page}<p>{$page_msg}</p></div>
+</div>
+{/block}
+{block name="script"} 
+<script >
+    layui.config({
+        base: '__JS__/' //自定义layui组件的目录
+    });
+    layui.use([ 'form' , 'jquery' ], function() {
+        var form = layui.form() , $ = layui.jquery;
+        
+        form.on( 'checkbox(status)' , function( data ){
+        	var uid = data.value , status , button = data.elem;
+        	var check = data.elem.checked ;
+        	check == true ? status = 1 : status = 0 ;
+        	$.get( "{:url( 'admin/User/userAjax' , '' , '' , true )}" , { status : status , uid : uid } , function( data ){
+        		if( data.code != 1){
+        			if( status == 1 ){
+        				$( button ).parent( '.status' ).find( '.layui-form-checkbox' ).removeClass( 'layui-form-checked' );
+        				$( button).prop( 'checked' ,false );
+        			}else{
+        				$( button ).parent( '.status' ).find( '.layui-form-checkbox' ).addClass( 'layui-form-checked' );
+        				$( button).prop( 'checked' , true );
+        			}
+        			
+        			layer.msg( data.msg, { icon : 2 , shade: 0.2 , time : 1000 } );
+                }
+        	});
+        });
+        
+      	//搜索框获取焦点
+        $( "input[name='search']" ).focus();
+        var result=$( "input[name='search']" ).val();		//对input取值
+        $( "input[name='search']" ).val( "" )						//使input的值为空
+        $( "input[name='search']" ).val( result );				//重新负值
+        $( "input[name='search']" )[ 0 ].scrollLeft=700; 	//这里我对文本框的属性做了一个猜想，所以进行一个偏移
+        //搜索
+        $( "#search" ).on( 'click' , function(){
+        	var url = $( this ).attr( 'url' );
+    		var search = $( 'input[name=search]' ).val();
+    		if(search != ''){
+    			url += '/search/' + search;
+    		}
+    		window.location.href = url;
+        });
+      	//回车搜索
+    	$( "input[name='search']" ).keyup(function(e) {
+    		if (e.keyCode === 13) {
+    			$("#search").click();
+    			return false;
+    		}
+    	});
+    });
+
+    layui.define('layer', function(exports){
+    	var $ = layui.jquery;
+
+        exports('del', function(uid){
+            layer.confirm( "{$lang[ 'confirm' ]}" , { icon : 3 , title : "{$lang[ 'del' ]}" } , function(index){
+                $.get( "{:url( 'admin/User/userDel' , '' , '' , true )}/uid/" + uid , '' , function(data){
+                    if( data.code == 1){
+                        layer.msg(data.msg, {icon:1});
+                        setTimeout(function(){
+                            location.href = data.url;
+                        },(2000));
+                    }else{
+                        layer.msg(data.msg, {icon:2})
+                    }
+                });
+            });
+        });
+    });
+</script>
+{/block}

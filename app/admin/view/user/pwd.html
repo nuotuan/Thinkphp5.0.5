@@ -1,0 +1,41 @@
+{extend name="base/base"}
+{block name="body"}
+<div class="admin-main">
+    <blockquote class="layui-elem-quote">{$lang[ 'edit_pwd' ]}</blockquote>
+    <form class="layui-form layui-form-pane" action="" method="post">
+		
+		<div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'oldpassword' ]}</label>
+            <div class="layui-input-block">
+                <input type="password" class="layui-input" name="oldpassword"  value="" />
+            </div>
+        </div>
+		
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'password' ]}</label>
+            <div class="layui-input-block">
+                <input type="password" class="layui-input" name="password"  value="" />
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'not_password' ]}</label>
+            <div class="layui-input-block">
+                <input type="password" class="layui-input" name="repassword" value="" />
+            </div>
+        </div>
+
+       <input type="hidden" name="uid" value="{$info.uid}" />
+       <div class="layui-form-item">
+         	<div class="layui-btn-group">
+			  	<a class="layui-btn my-red" href="javascript:;" onClick="javescript:history.go(-1);"><i class="layui-icon">&#xe603;</i>{$lang[ 'black' ]}</a>
+			  	<a class="layui-btn" href="javascript:;" onClick="javascript:location.reload();"><i class="layui-icon">&#x1002;</i> {$lang[ 'refresh' ]}</a>
+			  	<button class="layui-btn" lay-submit lay-filter="form_submit"><i class="layui-icon">&#xe60b;</i> {$lang[ 'yes' ]}</button>
+			</div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="script"}
+	{include file="base/form_script" /}
+{/block}

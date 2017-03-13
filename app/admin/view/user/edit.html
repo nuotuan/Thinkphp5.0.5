@@ -1,0 +1,85 @@
+{extend name="base/base"}
+{block name="body"}
+<div class="admin-main">
+    <blockquote class="layui-elem-quote">{if isset($info.uid)}{$lang[ 'edit_user' ]}{else/}{$lang[ 'add_user' ]}{/if}</blockquote>
+    <form class="layui-form layui-form-pane" action="" method="post">
+        
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'name' ]}</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" name="nickname" value="{$info.nickname|default = ''}" />
+            </div>
+        </div>
+        
+        {if empty( $info.uid )}
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'password' ]}</label>
+            <div class="layui-input-block">
+                <input type="password" class="layui-input" name="password"  value="{if isset($info.password)}no_change_password{/if}" />
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'not_password' ]}</label>
+            <div class="layui-input-block">
+                <input type="password" class="layui-input" name="repassword" value="{if isset($info.password)}no_again_passwords{/if}" />
+            </div>
+        </div>
+        {/if}
+        
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'email' ]}</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" name="email" value="{$info.email|default = ''}" />
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'power' ]}</label>
+            <div class="layui-input-block">
+                <select name="auth">
+                    <option value="0">{$lang[ 'unauth' ]}</option>
+                    {volist name="auth" id="au"}
+                    {if isset($info.auth)}
+                        {if $info.auth == $au.id}
+                            {php}$option = 'selected';{/php}
+                        {else/}
+                            {php}$option = '';{/php}
+                        {/if}
+                    {else/}
+                        {php}$option = '';{/php}
+                    {/if}
+                    <option value="{$au.id}" {$option}>{$au.title}</option>
+                    {/volist}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'user_status' ]}</label>
+            <div class="layui-input-block">
+                {if isset($info.status)}
+                    {if $info.status == '正常'}
+                        {php}$checked = "checked";{/php}
+                    {else/}
+                        {php}$checked = "";{/php}
+                    {/if}
+                {else/}
+                    {php}$checked = "checked";{/php}
+                {/if}
+                <input type="checkbox" name="status" title="{$lang[ 'enable' ]}" {$checked}>
+            </div>
+        </div>
+        {if isset($info.uid)}<input type="hidden" name="uid" value="{$info.uid}" />{/if}
+        <div class="layui-form-item">
+         	<div class="layui-btn-group">
+			  	<a class="layui-btn my-red" href="javascript:;" onClick="javescript:history.go(-1);"><i class="layui-icon">&#xe603;</i>{$lang[ 'black' ]}</a>
+			  	<a class="layui-btn" href="javascript:;" onClick="javascript:location.reload();"><i class="layui-icon">&#x1002;</i> {$lang[ 'refresh' ]}</a>
+			  	<button class="layui-btn" lay-submit lay-filter="form_submit"><i class="layui-icon">&#xe60b;</i> {$lang[ 'yes' ]}</button>
+			</div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="script"}
+	{include file="base/form_script" /}
+{/block}

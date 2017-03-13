@@ -1,0 +1,23 @@
+<script type="text/javascript">
+    layui.use(['form','jquery'], function(){
+        var $ = layui.jquery, layer = layui.layer, form = layui.form();
+        form.on('submit(form_submit)', function(data){
+            var button = data.elem;
+            $(button).addClass('layui-btn-disabled');
+            $(button).attr('disabled',true);
+            $.post('',data.field,function(res){
+                if( res.code == 1){
+                    layer.msg(res.msg, {icon:1});
+                    setTimeout(function(){
+                        location.href = res.url;
+                    },(2000))
+                }else{
+                    $(button).removeClass('layui-btn-disabled');
+                    $(button).removeAttr('disabled');
+                    layer.msg(res.msg, {icon:2})
+                }
+            });
+            return false;
+        })
+    })
+</script>

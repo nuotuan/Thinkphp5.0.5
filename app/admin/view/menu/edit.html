@@ -1,0 +1,78 @@
+{extend name="base/base"}
+{block name="body"}
+<div class="admin-main">
+	<blockquote class="layui-elem-quote">{if isset($info.id)}{$lang[ 'edit_column' ]}{else/}{$lang[ 'add_column' ]}{/if}</blockquote>
+    <form class="layui-form layui-form-pane" action="{:url( 'admin/Menu/menuEdit' )}" method="post">
+    
+    	<div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'column_name' ]}</label>
+            <div class="layui-input-block">
+			      <select name="pid" lay-verify="required">
+				        <option value="0">{$lang[ 'top_column' ]}</option>
+				        {volist name="menu" id="vl"}
+				        <option value="{$vl.id}" {if isset($info.pid) && $info.pid eq $vl.id}selected{/if} {if isset($info.id) && $info.id eq $vl.id}disabled{/if}>{if $vl.pid neq 0}{$vl.html}├ {/if}{$vl.title}</option>
+				        {/volist}
+			      </select>
+		    </div>
+        </div>
+    	
+    	<div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'column_name' ]}</label>
+            <div class="layui-input-block">
+            	<input autocomplete="off" type="text" class="layui-input" name="title" value="{$info.title|default = ''}" />
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'sort' ]}</label>
+            <div class="layui-input-block">
+            	<input autocomplete="off" type="text" class="layui-input" name="sort" value="{$info.sort|default = ''}" />
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'icon' ]}</label>
+            <div class="layui-input-block">
+            	<input autocomplete="off" type="text" class="layui-input"  placeholder="{$lang[ 'icon_placeholder' ]}" name="icon" value="{$info.icon|default = ''}" />
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'url' ]}</label>
+            <div class="layui-input-block">
+            	<input autocomplete="off" type="text" class="layui-input" name="url" value="{$info.url|default = ''}" />
+            </div>
+        </div>
+        
+        {if isset($info.status)}
+            {if $info.status eq 1}
+                {php}$checked_s = "checked";{/php}
+            {else/}
+                {php}$checked_s = "";{/php}
+            {/if}
+        {else/}
+            {php}$checked_s = "checked";{/php}
+        {/if}
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'status' ]}</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="status" title="{$lang[ 'using' ]}" {$checked_s} />
+            </div>
+        </div>
+        
+        {if isset($info.id)}<input type="hidden" name="id" value="{$info.id}" />{/if}
+         <div class="layui-form-item">
+         	<div class="layui-btn-group">
+			  	<a class="layui-btn my-red" href="javascript:;" onClick="javescript:history.go(-1);"><i class="layui-icon">&#xe603;</i>{$lang[ 'black' ]}</a>
+			  	<a class="layui-btn" href="javascript:;" onClick="javascript:location.reload();"><i class="layui-icon">&#x1002;</i> {$lang[ 'refresh' ]}</a>
+			  	<button class="layui-btn" lay-submit lay-filter="form_submit"><i class="layui-icon">&#xe60b;</i> {$lang[ 'yes' ]}</button>
+			</div>
+        </div>
+        
+        </form>
+</div>
+{/block}
+{block name="script"}
+    {include file="base/form_script" /}
+{/block}
+

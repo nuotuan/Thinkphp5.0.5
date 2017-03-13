@@ -1,0 +1,143 @@
+{extend name="base/base"}
+
+{block name="body"}
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header header header-demo">
+        <div class="layui-main">
+            <div class="admin-login-box">
+                <a class="logo" style="left: 0;" href="javascript:;">
+                    <span style="font-size: 22px;color:#eee;">SKZ_PHP</span>
+                </a>
+                <!--  
+                <div class="admin-side-toggle">
+                    <i class="fa fa-bars" aria-hidden="true"></i>
+                </div>
+                -->
+            </div>
+            <ul class="layui-nav admin-header-item none">
+            	<li class="layui-nav-item">
+                    <a href="javascript:location.reload();">刷新</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">清除缓存</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;" class="admin-header-user">
+                        <span>SONG</span>
+                    </a>
+                    <dl class="layui-nav-child left-nav">
+                        <dd>
+                            <a href="javascript:;"><i class="fa fa-user-circle" aria-hidden="true"></i> 个人信息</a>
+                        </dd>
+                        <dd>
+                            <a href="javascript:;"><i class="fa fa-gear" aria-hidden="true"></i> 设置</a>
+                        </dd>
+                        <dd>
+                            <a href="{:url('admin/Login/logout')}"><i class="fa fa-sign-out" aria-hidden="true"></i> 注销
+                            </a>
+                        </dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="layui-side layui-bg-black" id="admin-side">
+        <div class="layui-side-scroll" id="admin-navbar-side" lay-filter="side"></div>
+    </div>
+    <div class="layui-body" style="bottom: 0;border-left: solid 2px #1AA094;" id="admin-body">
+        <div class="layui-tab admin-nav-card layui-tab-brief" lay-filter="admin-tab">
+            <ul class="layui-tab-title">
+                <li class="layui-this">
+                    <i class="fa fa-dashboard" aria-hidden="true"></i>
+                    <cite>首页</cite>
+                </li>
+            </ul>
+            <div class="layui-tab-content" style="min-height: 150px; padding: 5px 0 0 0;">
+                <div class="layui-tab-item layui-show">
+                    <iframe src="{:url('admin/Index/main')}"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-footer footer footer-demo" id="admin-footer">
+        <div class="layui-main">
+            <p>&copy; 2017 SONG Email<a href="">1164922012@qq.com</a></p>
+        </div>
+    </div>
+    <div class="site-tree-mobile layui-hide">
+        <i class="layui-icon">&#xe602;</i>
+    </div>
+    <div class="site-mobile-shade"></div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript">
+	layui.config({
+	    base: '__JS__/' //自定义layui组件的目录
+	});
+	layui.use(['element', 'layer', 'navbar', 'tab'], function() {
+		var element = layui.element(),$ = layui.jquery,layer = layui.layer,navbar = layui.navbar() ;
+		//设置选项卡容器
+		var tab = layui.tab({ elem: '.admin-nav-card' });
+		//iframe自适应
+		$(window).on('resize', function() {
+			var $content = $('.admin-nav-card .layui-tab-content');
+			$content.height($(this).height() - 147);
+			$content.find('iframe').each(function() {
+				$(this).height($content.height());
+			});
+		}).resize();
+
+		//设置navbar
+		navbar.set({
+			spreadOne: true,
+	        data: 'json',
+			elem: '#admin-navbar-side',
+			cached: false,
+			url: '{:url( "admin/Index/left_menu" )}'
+		});
+		//渲染navbar
+		navbar.render();
+		//默认打开第一个菜单
+		$( $( ".layui-nav" ).children( "#admin-navbar-side .layui-nav-item" ).get( 0 ) ).addClass( 'layui-nav-itemed' );
+		//监听点击事件
+		navbar.on('click(side)', function(data) {
+			tab.tabAdd(data.field);
+		});
+	
+		$('.admin-side-toggle').on('click', function() {
+			var sideWidth = $('#admin-side').width();
+			if(sideWidth === 200) {
+				$('#admin-body').animate({
+					left: '0'
+				}); //admin-footer
+				$('#admin-footer').animate({
+					left: '0'
+				});
+				$('#admin-side').animate({
+					width: '0'
+				});
+			} else {
+				$('#admin-body').animate({
+					left: '200px'
+				});
+				$('#admin-footer').animate({
+					left: '200px'
+				});
+				$('#admin-side').animate({
+					width: '200px'
+				});
+			}
+		});
+	
+		//手机设备的简单适配
+		var treeMobile = $('.site-tree-mobile') , shadeMobile = $('.site-mobile-shade');
+		treeMobile.on('click', function() {
+			$('body').addClass('site-mobile');
+		});
+		shadeMobile.on('click', function() {
+			$('body').removeClass('site-mobile');
+		});
+	});
+</script>
+{/block}

@@ -1,0 +1,133 @@
+{extend name="base/base"}
+
+{block name="body"}
+<div class="admin-main">
+	<blockquote class="layui-elem-quote">{if isset($info.id)}{$lang[ 'edit_auth' ]}{else/}{$lang[ 'add_auth' ]}{/if}</blockquote>
+	<form action=""  method="POST" class="layui-form layui-form-pane">
+		<div class="layui-form-item">
+		    <label class="layui-form-label">{$lang[ 'auth_name' ]}</label>
+		    <div class="layui-input-block">
+		        <input type="text" class="layui-input" name="title" value="{$info.title|default = ''}" />
+		    </div>
+		</div>
+    
+	    <div class="layui-form-item">
+	        <label class="layui-form-label">{$lang[ 'remark' ]}</label>
+	        <div class="layui-input-block">
+	            <input type="text" class="layui-input" name="remark" value="{$info.remark|default = ''}" />
+	        </div>
+	    </div>
+	    
+	    <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'status' ]}</label>
+            <div class="layui-input-block">
+                {if isset($info.status)}
+                    {if $info.status eq 1}
+                        {php}$checked = "checked";{/php}
+                    {else/}
+                        {php}$checked = "";{/php}
+                    {/if}
+                {else/}
+                    {php}$checked = "checked";{/php}
+                {/if}
+                <input type="checkbox" name="status" title="{$lang[ 'enable' ]}" {$checked}>
+            </div>
+        </div>
+	
+		<!-- 访问授权 -->
+		<blockquote class="layui-elem-quote">{$lang[ 'auth' ]}</blockquote>
+		<div class="tab-pane in">
+			{volist name="menu" id="vl"}
+				<dl class="checkmod">
+					<dt class="hd">
+						<label class="">
+							<input class="auth_rules rules_all" type="checkbox" name="auth[]" value="{$vl.id}"><span>{$vl.title}</span>
+						</label>
+					</dt>
+					<dd class="bd">
+						{present name="vl.child"}
+						{volist name="vl.child" id="child" }
+	                           <div class="rule_check">
+	                               <div>
+	                                   <label class="">
+	                                  		<input class="auth_rules rules_row" type="checkbox" name="auth[]" value="{$child.id}"/><span>{$child.title}</span>
+	                                   </label>
+	                               </div>
+	                              {notempty name="child['child']"}
+	                                  <span class="divsion">&nbsp;</span>
+	                                  <span class="child_row">
+	                                          {:auth_menu_view( $child[ 'child' ] )}
+	                                  </span>
+	                              {/notempty}
+		                    </div>
+						{/volist}
+						{/present}
+					</dd>
+				</dl>
+			{/volist}
+		</div>
+		{if isset($info.id)}<input type="hidden" name="id" value="{$info.id}" />{/if}
+        <div class="layui-form-item">
+         	<div class="layui-btn-group">
+			  	<a class="layui-btn my-red" href="javascript:;" onClick="javescript:history.go(-1);"><i class="layui-icon">&#xe603;</i>{$lang[ 'black' ]}</a>
+			  	<a class="layui-btn" href="javascript:;" onClick="javascript:location.reload();"><i class="layui-icon">&#x1002;</i> {$lang[ 'refresh' ]}</a>
+			  	<button class="layui-btn button" lay-submit lay-filter="form_submit"><i class="layui-icon">&#xe60b;</i> {$lang[ 'yes' ]}</button>
+			</div>
+        </div>
+	</form>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript">
+layui.config({
+    base: '__JS__/' //自定义layui组件的目录
+});
+layui.use([ 'layer' , 'form' , 'jquery' ] , function(){
+	var $ = layui.jquery;
+	
+    var rules = [{if isset( $info.auth )}{$info.auth}{/if}];
+    $('.auth_rules').each(function(){
+        if( $.inArray( parseInt(this.value,10),rules )>-1 ){
+            $(this).prop('checked',true);
+        }
+        if(this.value==''){
+            $(this).closest('span').remove();
+        }
+    });
+
+    
+	//全选节点
+	$( '.rules_all' ).on( 'change' , function(){
+	    $(this).closest('dl').find('dd').find('input').prop( 'checked' , this.checked );
+	});
+	$( '.rules_row' ).on( 'change' , function(){
+		$( this ).closest( '.checkmod' ).find( '.hd' ).find( '.rules_all' ).prop( 'checked' , true );
+        $(this).closest('.rule_check').find('.child_row').find('input').prop('checked',this.checked);
+    });
+	$( '.rules' ).on( 'click' , function(){
+		$( this ).closest( '.checkmod' ).find( '.hd' ).find( '.rules_all' ).prop( 'checked' , 'checked' );
+		$( this ).closest( '.rule_check' ).find( '.rules_row' ).prop( 'checked' , true );
+	});
+	
+	$( ".layui-form" ).submit( function(e){
+		var query = $( this ).serialize() ;
+		$( '.button' ).addClass( 'layui-btn-disabled' );
+        $( '.button' ).attr( 'disabled' , true );
+		$.post( '' , query , function(res){
+	        if( res.code == 1){
+	            layer.msg(res.msg, {icon:1});
+	            setTimeout(function(){
+	                location.href = res.url;
+	            },(2000))
+	        }else{
+	            $( '.button' ).removeClass('layui-btn-disabled');
+	            $( '.button' ).removeAttr('disabled');
+	            layer.msg(res.msg, {icon:2})
+	        }
+	    });
+		return false;
+	});
+});
+</script>
+
+{/block}

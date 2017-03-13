@@ -1,0 +1,24 @@
+{extend name="base/base"}
+
+{block name="body"}
+<div class="admin-main">
+	<blockquote class="layui-elem-quote">基本信息</blockquote>
+	<table class="layui-table" lay-skin="line">
+		<colgroup><col width="150"><col></colgroup>
+		<tbody>
+			{volist name="info" id="val"}
+			<tr>
+			    <td>{$key}</td>
+			    <td>{$val}</td>
+			</tr>
+			{/volist}
+
+	    </tbody>
+	</table>
+</div>
+{/block}
+
+{block name="script"}
+
+{/block}
+

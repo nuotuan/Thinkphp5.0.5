@@ -1,0 +1,56 @@
+{extend name="base/base"}
+{block name="body"}
+<div class="admin-main">
+	<blockquote class="layui-elem-quote">{if isset($info.id)}{$lang[ 'edit_config' ]}{else/}{$lang[ 'add_config' ]}{/if}</blockquote>
+    <form class="layui-form layui-form-pane" action="{:url( 'admin/Config/configEdit' )}" method="post">
+    
+    	<div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'config_charac' ]}</label>
+            <div class="layui-input-block">
+			      <input type="text" class="layui-input" name="name" value="{$info.name|default = ''}" />
+		    </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'config_title' ]}</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" name="title" value="{$info.title|default = ''}" />
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$lang[ 'sort' ]}</label>
+            <div class="layui-input-block">
+                <input type="number" class="layui-input" name="sort" value="{$info.sort|default = ''}" />
+            </div>
+        </div>
+        
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">{$lang[ 'value' ]}</label>
+            <div class="layui-input-block">
+            	<textarea class="layui-textarea" name="value" >{$info.value|default = ''}</textarea>
+            </div>
+        </div>
+        
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">{$lang[ 'remark' ]}</label>
+            <div class="layui-input-block">
+            	<textarea class="layui-textarea" name="remark" >{$info.remark|default = ''}</textarea>
+            </div>
+        </div>
+
+       {if isset($info.id)}<input type="hidden" name="id" value="{$info.id}" />{/if}
+        
+		<div class="layui-form-item">
+         	<div class="layui-btn-group">
+			  	<a class="layui-btn my-red" href="javascript:;" onClick="javescript:history.go(-1);"><i class="layui-icon">&#xe603;</i>{$lang[ 'black' ]}</a>
+			  	<a class="layui-btn" href="javascript:;" onClick="javascript:location.reload();"><i class="layui-icon">&#x1002;</i> {$lang[ 'refresh' ]}</a>
+			  	<button class="layui-btn" lay-submit lay-filter="form_submit"><i class="layui-icon">&#xe60b;</i> {$lang[ 'yes' ]}</button>
+			</div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="script"}
+    {include file="base/form_script" /}
+{/block}

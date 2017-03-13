@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>{:config('WEB_SITE_TITLE')}</title>
+    <link rel="stylesheet" href="__STATIC__/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="__CSS__/login.css" />
+</head>
+
+<body class="beg-login-bg">
+<div class="beg-login-box">
+    <header><h1>{:config('WEB_SITE_TITLE')}</h1></header>
+    <div class="beg-login-main">
+        <form action="" class="layui-form" method="post">
+            <div class="layui-form-item">
+                <label class="beg-login-icon">
+                    <i class="layui-icon">&#xe612;</i>
+                </label>
+                <input type="text" name="nickname" autocomplete="off" placeholder="用户名" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="beg-login-icon">
+                    <i class="layui-icon">&#xe642;</i>
+                </label>
+                <input type="password" name="password" autocomplete="off" placeholder="密码" class="layui-input">
+            </div>
+            <div class="layui-form-item verify" {if !isset( $verify )}style="display:none;"{/if}>
+            	<div class="layui-input-inline" style="width:130px;">
+	                <label class="beg-login-icon">
+	                    <i class="layui-icon">&#xe60d;</i>
+	                </label>
+	                <input type="text" name="code" autocomplete="off" placeholder="验证码" class="layui-input">
+	            </div>
+                <div class=""><img class="reloadverify" src="{:captcha_src()}" style="width:130px;height:38px;cursor: pointer;"/></div>
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="login" style="width: 100%">
+                    <i class="layui-icon">&#xe618;</i> 登录
+                </button>
+            </div>
+
+        </form>
+    </div>
+    <footer>
+        <p>&copy; 2017 SONG</p>
+    </footer>
+</div>
+<script type="text/javascript" src="__STATIC__/layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['layer', 'form'], function(){
+        var layer = layui.layer,$ = layui.jquery,form = layui.form();
+        
+        $(".reloadverify").click(function(){
+     	   	var verifyimg = $( this ).attr("src");
+           	$( this ).attr("src", verifyimg.replace(/\?.*$/,'')+'?'+Math.random());
+        });
+        
+        form.on('submit(login)',function(data){
+            $.post( '' , data.field , function( data ){
+                 if( data.code == 1 ){
+                     layer.msg(data.msg, {icon:1});
+                     setTimeout(function(){
+                         location.href = data.url;
+                     },( 1000 ) )
+                 }else{
+                	 if( data.msg.num >= 3 ){
+ 						$( '.verify' ).show();
+ 						//刷新验证码
+ 	     				$(".reloadverify").click();
+ 					}
+                     layer.msg(data.msg.error, {icon:2})
+                 }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+{extend name="base/base"}
+{block name="body"}
+<div class="admin-main">
+    <blockquote class="layui-elem-quote">{$lang[ 'menu_manage' ]}</blockquote>
+    <div>
+        <a class="layui-btn"  href="{:url( 'admin/Menu/menuAdd' )}"><i class="layui-icon">&#xe608;</i> {$lang[ 'add_column' ]}</a>
+        <a class="layui-btn" href="javascript:;" onClick="javascript:location.reload();"><i class="layui-icon">&#x1002;</i> {$lang[ 'refresh' ]}</a>
+    </div>
+
+    <table class="layui-table tree" lay-skin="line">
+        <thead>
+        <tr>
+            <th>{$lang[ 'id' ]}</th>
+            <th>{$lang[ 'column_name' ]}</th>
+            <th>{$lang[ 'column_address' ]}</th>
+            <th class="my-center">{$lang[ 'sort' ]}</th>
+            <th class="my-center">{$lang[ 'status' ]}</th>
+            <th>{$lang[ 'operate' ]}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="data" id="da" empty="<tr><td colspan='6'>$lang[empty]</td></tr>"}
+        <tr class="treegrid-{$da.id} {if $da.pid > 0} treegrid-parent-{$da.pid}{/if}">
+            <td>{$da.id}</td>
+            <td>{if $da.pid neq 0}{$da.html}├ {/if}{$da.title}</td>
+            <td>{$da.url}</td>
+            <td class="my-center">{$da.sort}</td>
+            <td class="my-center">
+            	<div class="layui-form layui-input-inline status">
+            		<input type="checkbox" name="status" lay-filter="status" value="{$da.id}" title="{$lang[ 'using' ]}"  {if $da.status eq 1}checked{/if}/>
+            	</div>
+            </td>
+            <td>
+                <a class="layui-btn layui-btn-small" href="{:url( 'admin/Menu/menuEdit' , array( 'id' => $da[ 'id' ] ) )}"><i class="layui-icon">&#xe642;</i>{$lang[ 'edit' ]}</a>
+                <button class="layui-btn layui-btn-small" onclick="layui.del({$da.id})"><i class="layui-icon">&#xe640;</i>{$lang[ 'del' ]}</button>
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+</div>
+{/block}
+
+{block name="script"}
+<script type="text/javascript">
+    layui.config({
+        base: '__JS__/' //自定义layui组件的目录
+    });
+    
+    layui.use(['form','jquery'], function(){
+        var form = layui.form() , $ = layui.jquery ;
+        
+        form.on( 'checkbox(status)' , function( data ){
+        	var id = data.value , status , button = data.elem;
+        	var check = data.elem.checked ;
+        	check == true ? status = 1 : status = 0 ;
+        	$.get( "{:url( 'admin/Menu/menuAjax' , '' , '' , true )}" , { status : status , id : id } , function( data ){
+        		if( data.code != 1){
+        			if( status == 1 ){
+        				$( button ).parent( '.status' ).find( '.layui-form-checkbox' ).removeClass( 'layui-form-checked' );
+        				$( button).prop( 'checked' ,false );
+        			}else{
+        				$( button ).parent( '.status' ).find( '.layui-form-checkbox' ).addClass( 'layui-form-checked' );
+        				$( button).prop( 'checked' , true );
+        			}
+        			
+        			layer.msg( data.msg, { icon : 2 , shade: 0.2 , time : 1000 } );
+                }
+        	});
+        });
+        
+    });
+
+    layui.define('layer',function(exports){
+        var $ = layui.jquery;
+        exports('del', function(id){
+            layer.confirm( "{$lang[ 'confirm' ]}",{ icon : 3 , title : "{$lang[ 'del' ]}" } , function(index){
+                $.get( "{:url( 'admin/Menu/menuDel' , '' , '' , true )}/id/" + id, '',function(data){
+                    if( data.code == 1){
+                        layer.msg(data.msg, {icon:1});
+                        setTimeout(function(){
+                            location.href = data.url;
+                        },(2000));
+                    }else{
+                        layer.msg(data.msg, {icon:2})
+                    }
+                })
+            })
+        });
+    })
+</script>
+{/block}
+
+
